@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api import router as auth_router
+# from src.api import router as auth_router
 
 app = FastAPI(
     title="Microservice for catalog and search for an online electronics store",
@@ -9,4 +9,4 @@ app = FastAPI(
     debug=True
 )
 
-app.include_router(_router, prefix="/api/v1")
+# app.include_router(_router, prefix="/api/v1")
