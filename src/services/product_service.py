@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 
 from src.models.product import Product
 
@@ -23,8 +24,13 @@ class ProductService:
             offset: int
     ) -> tuple[list[Product], int]:
 
+        # ДОБАВИЛИ joinedload: теперь категория подтягивается сразу
         # 1. Строим базовый запрос списка товаров
-        query = select(Product).where(Product.is_active == True)
+        query = (
+            select(Product)
+            .where(Product.is_active == True)
+            .options(joinedload(Product.category))
+        )
 
         # Строим параллельный запрос для подсчета total count (без лимитов и оффсетов)
         count_query = select(func.count()).select_from(Product).where(Product.is_active == True)
@@ -49,8 +55,9 @@ class ProductService:
         result_items = await self.db.execute(query)
         result_count = await self.db.execute(count_query)
 
-        products = result_items.scalars().all()
+        # Благодаря joinedload unique() делать не обязательно для Many-to-One,
+        # но для предотвращения дублирования строк при JOIN это хорошая привычка:
+        products = result_items.scalars().unique().all()
         total_count = result_count.scalar() or 0
 
         return products, total_count
-

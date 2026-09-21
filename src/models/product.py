@@ -39,7 +39,17 @@ class Product(Base):
 
     # Индексы для быстрого поиска и фильтрации по JSONB
     __table_args__ = (
+        # старый GIN-индекс для JSONB параметров
         Index("ix_products_attributes_gin", "attributes", postgresql_using="gin"),
+
+        # НОВЫЙ СОСТАВНОЙ ИНДЕКС ДЛЯ СПИСКА ТОВАРОВ
+        # Порядок важен: сначала поля фильтрации, в конце — поле сортировки!
+        Index(
+            "ix_products_filtered_list",
+            "is_active",
+            "category_id",
+            "created_at"
+        ),
     )
 
     # Обратная связь: product.category
