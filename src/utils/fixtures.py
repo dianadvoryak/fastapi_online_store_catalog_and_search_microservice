@@ -2,8 +2,9 @@ import asyncio
 import random
 from decimal import Decimal
 from uuid import uuid4
+
 from faker import Faker
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete  # Импортируем функцию удаления
 
 # Ваши импорты моделей и фабрики сессий
 from src.core.db import async_session_maker
@@ -29,7 +30,21 @@ TECH_ATTRIBUTES = {
 
 
 async def seed_data():
-    async with async_session_maker() as session:  # Смена на вашу асинхронную сессию
+    async with async_session_maker() as session:
+        # --- ОЧИСТКА БАЗЫ ДАННЫХ ---
+        print("Очистка старых данных...")
+
+        # Сначала удаляем продукты (зависимая таблица)
+        await session.execute(delete(Product))
+
+        # Затем удаляем категории (главная таблица)
+        await session.execute(delete(Category))
+
+        # Применяем изменения очистки перед добавлением новых
+        await session.flush()
+        print("База данных успешно очищена.")
+
+        # --- ЗАПОЛНЕНИЕ ДАННЫМИ ---
         print("Начало генерации данных...")
 
         # 1. Создаем корневую категорию
@@ -49,7 +64,8 @@ async def seed_data():
         for cat in sub_categories:
             attr_pool = TECH_ATTRIBUTES.get(cat.title == "Смартфоны" and "Smartphones" or "Laptops")
 
-            for _ in range(25):  # Сгенерируем по 25 товаров на категорию
+            # Генерируем по 25 товаров (исправлено количество в range)
+            for _ in range(500):
                 # Формируем случайные характеристики техники в JSON
                 product_attrs = {key: random.choice(values) for key, values in attr_pool.items()}
 
