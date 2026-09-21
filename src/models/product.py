@@ -1,7 +1,8 @@
-from uuid import UUID, uuid4
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
 from typing import Any, Dict, Optional
+from uuid import UUID, uuid4
+
 from sqlalchemy import String, Numeric, DateTime, Index, ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
