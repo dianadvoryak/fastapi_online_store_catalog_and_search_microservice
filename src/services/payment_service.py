@@ -9,6 +9,14 @@ class PaymentService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def _activate_order(self, order_id: str):
+        """Внутренний асинхронный метод для выполнения бизнес-логики после оплаты."""
+        print(f"Заказ {order_id} успешно оплачен! Активируем подписку/отгружаем товар...")
+        # Сюда вставляйте вызовы других сервисов, отправку ивентов в RabbitMQ/Kafka и т.д.
+        # await self.order_service.mark_as_paid(order_id)
+        pass
+
+
     async def handle_payment_webhook(self, payload: WebhookWebhookPayload):
         """
         Эндпоинт для приема уведомлений об оплате от стороннего сервиса.
@@ -68,11 +76,4 @@ class PaymentService:
             await self._activate_order(new_payment.order_id)
 
         return {"status": "created", "payment_id": str(new_payment.id)}
-
-    async def _activate_order(self, order_id: str):
-        """Внутренний асинхронный метод для выполнения бизнес-логики после оплаты."""
-        print(f"Заказ {order_id} успешно оплачен! Активируем подписку/отгружаем товар...")
-        # Сюда вставляйте вызовы других сервисов, отправку ивентов в RabbitMQ/Kafka и т.д.
-        # await self.order_service.mark_as_paid(order_id)
-        pass
 
