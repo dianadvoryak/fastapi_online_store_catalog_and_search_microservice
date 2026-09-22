@@ -2,7 +2,8 @@
 python -m src.utils.fixtures  
   
 
-
+endpoints:
+<img src="./src/utils/docs.png">
 
 
 ```
